@@ -1,8 +1,11 @@
 package src;
 
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
 
 public class Sprite {
 	private Image image;
@@ -14,7 +17,8 @@ public class Sprite {
 	private double height;
 	private double maxX;
 	private double maxY;
-
+	private int rotationAngle;
+	
 	public Sprite(String path, double width, double height, double maxX, double maxY) {
 		image = new Image(path, width, height, false, false);
 		this.width = width;
@@ -30,7 +34,22 @@ public class Sprite {
 		maxX = s.maxX;
 		maxY = s.maxY;
 	}
-
+	
+	public double getX() {
+		return this.x;
+	}
+	public double getY() {
+		return this.y;
+	}
+	
+	public int getRotationAngle() {
+		return this.rotationAngle;
+	}
+	
+	public Image getImage() {
+		return this.image;
+	}
+	
 	public double width() {
 		return width;
 	}
@@ -96,7 +115,13 @@ public class Sprite {
 	}
 
 	public void render(GraphicsContext gc) {
-		gc.drawImage(image, x, y);
+		
+		ImageView iv = new ImageView(this.image);
+        iv.setRotate(rotationAngle);
+        SnapshotParameters params = new SnapshotParameters();
+        params.setFill(Color.TRANSPARENT);
+        Image rotatedImage = iv.snapshot(params, null);
+        gc.drawImage(rotatedImage, this.x, this.y);
 	}
 
 	public boolean intersects(Sprite s) {
@@ -107,5 +132,78 @@ public class Sprite {
 	public String toString() {
 		return "Sprite<" + x + ", " + y + ">";
 	}
+	
+	public static double distance(double currentXPosition, double currentYPosition, double destinationX, double destinationY) {
+		return Math.sqrt((Math.pow(destinationX-currentXPosition, 2) + Math.pow(destinationY-currentYPosition, 2)));
+	}
+	
+	public void rotate() {
+		
+		if (this.xSpeed == -1) {
+			this.rotationAngle = -90;
+		}
+		
+		if (this.xSpeed == 1) {
+			this.rotationAngle = 90;
+		}
+		
+		if (this.ySpeed == -1) {
+			this.rotationAngle = 0;
+		}
+		
+		if (this.ySpeed == 1) {
+			this.rotationAngle = -180;
+		}
+		
+		if (this.xSpeed == -1 && this.ySpeed == -1)
+			rotationAngle = -45;
+		
+		if (this.xSpeed == 1 && this.ySpeed == -1)
+			rotationAngle = 45;
+		
+		if (this.xSpeed == -1 && this.ySpeed == 1)
+			rotationAngle = -135;
+		
+		if (this.xSpeed == 1 && this.ySpeed == 1)
+			rotationAngle = 135;
+	}
+	
+	public boolean travel(double destinationX, double destinationY) {
 
+			double distanceToDestination = distance(x, y, destinationX, destinationY);
+			
+			xSpeed = 0;
+			ySpeed = 0;
+			
+			if (distance(this.x-1, this.y, destinationX, destinationY) < distanceToDestination) 
+				this.xSpeed--;
+			
+				
+			
+			if (distance(this.x, this.y-1, destinationX, destinationY) < distanceToDestination) 
+				this.ySpeed--;
+			
+				
+			
+			if (distance(this.x+1, this.y, destinationX, destinationY) < distanceToDestination) 
+				this.xSpeed++;
+			
+				
+			
+			if (distance(this.x, this.y+1, destinationX, destinationY) < distanceToDestination) 
+				this.ySpeed++;
+				rotationAngle = -180;
+			
+				
+			if (this.x == destinationX && this.y == destinationY) {
+				xSpeed = 0;
+				ySpeed = 0;
+				return false;
+			}
+			
+			this.rotate();
+			
+		return true;
+	}
+	
 }
