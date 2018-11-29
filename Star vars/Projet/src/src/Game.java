@@ -3,7 +3,6 @@ package src;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Random;
 
 import javafx.scene.input.KeyCode;
 
@@ -28,9 +27,9 @@ import javafx.stage.Stage;
 
 public class Game extends Application {
     private int score;
-    private final static int WIDTH = 1600;
-    private final static int HEIGHT = 900;
-    
+    private final static int WIDTH = 1200;
+    private final static int HEIGHT = 800;
+
     public static String getRessourcePathByName(String name) {
         return Game.class.getResource('/' + name).toString();
     }
@@ -38,13 +37,7 @@ public class Game extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    
-    public static int randomize(int min, int max) {
-		Random rand = new Random();
-	    int randomNumber = rand.nextInt(max-min + 1) + min;
-	    return randomNumber;
-	}
-    
+
     public void start(Stage stage) {
 
         stage.setTitle("Star vars");
@@ -61,30 +54,19 @@ public class Game extends Application {
         gc.setStroke(Color.RED);
         gc.setLineWidth(1);
 
-        Image space = new Image(getRessourcePathByName("images/Background2.png"), WIDTH, HEIGHT, false, false);
+        Image space = new Image(getRessourcePathByName("images/background.jpg"), WIDTH, HEIGHT, false, false);
         
-        ArrayList<Planet> planetArray = new ArrayList<Planet>();
-        planetArray.add(new Planet(randomize(0, WIDTH-100), randomize(0, HEIGHT-100), randomize(64, 256),"BASIS", 0.9, "images/planet1.png"));
-        planetArray.get(0).correctPlanetCollisionsAndBorders(planetArray, WIDTH-100, HEIGHT-100);
         
-        planetArray.add(new Planet(randomize(0, WIDTH-100), randomize(0, HEIGHT-100), randomize(64, 256),"BASIS", 0.9, "images/planet2.png"));
-        planetArray.get(1).correctPlanetCollisionsAndBorders(planetArray, WIDTH-100, HEIGHT-100);
-        
-        planetArray.add(new Planet(randomize(0, WIDTH-100), randomize(0, HEIGHT-100), randomize(64, 256),"BASIS", 0.9, "images/planet3.png"));
-        planetArray.get(2).correctPlanetCollisionsAndBorders(planetArray, WIDTH-100, HEIGHT-100);
-        
-        planetArray.add(new Planet(randomize(0, WIDTH-100), randomize(0, HEIGHT-100), randomize(64, 256),"BASIS", 0.9, "images/planet4.png"));
-        planetArray.get(3).correctPlanetCollisionsAndBorders(planetArray, WIDTH-100, HEIGHT-100);
-        
-        planetArray.add(new Planet(randomize(0, WIDTH-100), randomize(0, HEIGHT-100), randomize(64, 256),"BASIS", 0.9, "images/planet5.png"));
-        planetArray.get(4).correctPlanetCollisionsAndBorders(planetArray, WIDTH-100, HEIGHT-100);
-        
-        planetArray.add(new Planet(randomize(0, WIDTH-100), randomize(0, HEIGHT-100), randomize(64, 256),"BASIS", 0.9, "images/planet6.png"));
-        planetArray.get(5).correctPlanetCollisionsAndBorders(planetArray, WIDTH-100, HEIGHT-100);
+        Entity center = new Entity(100,100);
+        Entity center2 = new Entity(1000,300);
+
+        ArrayList<Planet> planetarray = new ArrayList<Planet>();
+        planetarray.add(new Planet(center.getX(), center.getY(), 150, "BASIS", 0.9, "images/planet1.png", 2));
+        planetarray.add(new Planet(center2.getX(), center2.getY(), 90, "BASIS", 0.9, "images/mars.png", 2));
         
         ArrayList<Image> imgTab = new ArrayList<Image>();
-        for (int i = 0; i < planetArray.size(); i++) {
-        	imgTab.add(new Image(planetArray.get(i).getPathName(), planetArray.get(i).getRandomDimensions(), planetArray.get(i).getRandomDimensions(), false, false)); 
+        for (int i = 0; i < planetarray.size(); i++) {
+        	imgTab.add(new Image(planetarray.get(i).getPathName(), planetarray.get(i).getRadius(), planetarray.get(i).getRadius(), false, false)); 
         }
         
         /*Image planet1 = new Image(getRessourcePathByName("images/mars.png"), c.getRadius(), c.getRadius(), false, false);
@@ -140,27 +122,21 @@ public class Game extends Application {
         });
 
         new AnimationTimer() {
-        	
             public void handle(long arg0) {
                 gc.drawImage(space, 0, 0);
-                for (int i = 0; i < imgTab.size(); i++) {
+                for (int i = 0; i < planetarray.size(); i++) {
                 /*gc.drawImage(planet1, c.getCenter().getX(), c.getCenter().getY());
                 gc.drawImage(planet2, c2.getCenter().getX(), c2.getCenter().getY());*/
-                
-                gc.drawImage(imgTab.get(i), planetArray.get(i).getX(), planetArray.get(i).getY());
-                String nbOfVessels = "" + planetArray.get(i).getNbVessels();
-                gc.setFill(Color.BLACK);
-                gc.setStroke(Color.BLACK);
-                gc.fillText(nbOfVessels, planetArray.get(i).getX()+planetArray.get(i).getRadius()-18, planetArray.get(i).getY()+planetArray.get(i).getRadius()+10);
+                gc.drawImage(imgTab.get(i),100*i,200*i);
                 }
                 
                 spaceship.updatePosition();
                 spaceship.render(gc);
 
-                //String txt = "Score: " + score;
-                //gc.fillText(txt, WIDTH - 36, 36);
-                //gc.strokeText(txt, WIDTH - 36, 36);
-                //gc.setTextAlign(TextAlignment.RIGHT);
+                String txt = "Score: " + score;
+                gc.fillText(txt, WIDTH - 36, 36);
+                gc.strokeText(txt, WIDTH - 36, 36);
+                gc.setTextAlign(TextAlignment.RIGHT);
             }
         }.start();
     }
