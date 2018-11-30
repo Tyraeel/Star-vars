@@ -2,6 +2,7 @@ package src;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.TimerTask;
 
 public class Planet extends Entity{
 	
@@ -14,19 +15,18 @@ public class Planet extends Entity{
 	private ArrayList<Spaceship> reserveOfVessels;  /* à ajouter quand on aura la classe Ship */
 	private Player owner; 	/* à ajouter quand on aura la classe Player */
 	
-	public Planet(double x, double y, int randomDimensions, String productionType, double productionRate, String pathname) {
+	public Planet(double x, double y, int randomDimensions, Spaceship productionType, double productionRate, String pathname) {
         super(x, y);
 		this.randomDimensions = randomDimensions;
 		this.pathname=pathname;
-		this.productionType = productionType;
 		this.productionRate = productionRate;
-		this.nbOfVessels = 25 + (int)((int)randomDimensions*0.5);
+		this.nbOfVessels = 10 + (int)((int)randomDimensions*0.25);
 		this.reserveOfVessels = new ArrayList<Spaceship>();
 		
 		this.radius = randomDimensions/2;
 		
 		for (int i = 1; i < nbOfVessels; i++) {
-			this.reserveOfVessels.add(new Spaceship(this.productionType, this));
+			this.reserveOfVessels.add(new Spaceship(productionType));
 		}
 	}
 	
@@ -46,6 +46,10 @@ public class Planet extends Entity{
 		return this.nbOfVessels;
 	}
 	
+	public ArrayList<Spaceship> getReserveOfVessels(){
+		return this.reserveOfVessels;
+	}
+	
 	public void setOwner(Player p) {
 		this.owner = p;
 	}
@@ -56,9 +60,14 @@ public class Planet extends Entity{
 	    return randomNumber;
 	}
 	
-	public void produceSpaceship() {
-		this.reserveOfVessels.add(new Spaceship(this.productionType, this));
+	public void produceSpaceship(Spaceship s) {
+		this.reserveOfVessels.add(new Spaceship(s));
+		this.reserveOfVessels.get(this.reserveOfVessels.size()-1).setPosition(this.randomDimensions+this.reserveOfVessels.size(), this.randomDimensions+this.reserveOfVessels.size());
 		this.nbOfVessels++;
+	}
+	
+	public void placeNewVessel() {
+		
 	}
 	
 	public void reduceNbSpaceship() {
@@ -69,7 +78,7 @@ public class Planet extends Entity{
 	}
 	
 	public double distance(Planet p) {
-		return Math.sqrt((Math.pow(p.getX()-this.getX(), 2) + Math.pow(p.getY()-this.getY(), 2)));
+		return Math.sqrt((Math.pow((p.getX()+p.getRadius())-(this.getX()+this.getRadius()), 2) + Math.pow((p.getY()+p.getRadius())-(this.getY()+this.getRadius()), 2)));
 	}
 	
 	public void correctPlanetCollisionsAndBorders(ArrayList<Planet> planets, int width, int height) {
@@ -88,7 +97,6 @@ public class Planet extends Entity{
         
         if (this.getY()-this.getRadius()<0)
         	this.setY(this.getY()+this.getRadius());
-    	
 	    
         for(int i = 0; i < planets.size(); i++) {
         	System.out.println("================ Planet " + i + " ==========================");
